@@ -28,7 +28,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       {loaderData ? (
         <>
           <p>Hello, {loaderData?.data.displayName}!</p>
-          <img src={loaderData?.data.avatar} alt="Avatar" height={50} />
+          <img src={loaderData?.data.avatar} alt="Avatar" width={50} />
         </>
       ) : (
         <>
