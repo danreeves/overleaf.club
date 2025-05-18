@@ -1,17 +1,43 @@
-import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { Agent } from "@atproto/api"
+import type { Route } from "./+types/home"
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
-}
-
-export function loader({ context }: Route.LoaderArgs) {
-  return { message: context.cloudflare.env.VALUE_FROM_CLOUDFLARE };
+export async function loader({ context, request }: Route.LoaderArgs) {
+  const session = await context.session.getSession(
+    request.headers.get("Cookie"),
+  )
+  const did = session.get("did")
+  if (did) {
+    try {
+      const oauthSession = await context.client.restore(did)
+      const agent = oauthSession ? new Agent(oauthSession) : null
+      const profile = await agent?.getProfile({ actor: did })
+      return profile
+    } catch (e) {
+      console.error("Failed to load profile:", e)
+      return undefined
+    }
+  } else {
+    return undefined
+  }
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  return <Welcome message={loaderData.message} />;
+  return (
+    <div>
+      <h1>Home</h1>
+      {loaderData ? (
+        <>
+          <p>Hello, {loaderData?.data.displayName}!</p>
+          <img src={loaderData?.data.avatar} alt="Avatar" height={50} />
+        </>
+      ) : (
+        <>
+          <p>You are not logged in.</p>
+          <p>
+            <a href="/login">Login</a>
+          </p>
+        </>
+      )}
+    </div>
+  )
 }

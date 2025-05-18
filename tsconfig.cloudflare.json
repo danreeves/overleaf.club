@@ -6,6 +6,8 @@
     "app/**/.server/**/*",
     "app/**/.client/**/*",
     "workers/**/*",
+    "database/**/*",
+    "oauth/**/*",
     "worker-configuration.d.ts"
   ],
   "compilerOptions": {
