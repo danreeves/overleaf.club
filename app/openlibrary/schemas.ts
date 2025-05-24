@@ -128,7 +128,18 @@ export const AuthorSchema = z.object({
   type: z.object({ key: z.string() }),
   alternate_names: z.array(z.string()).optional(),
   key: z.string(),
-  bio: z.string().optional(),
+  bio: z
+    .union([z.string(), z.object({ type: z.string(), value: z.string() })])
+    .optional()
+    .transform((val) => {
+      if (typeof val === "object" && "value" in val) {
+        return val.value
+      }
+      if (typeof val === "string") {
+        return val
+      }
+      return undefined
+    }),
   links: z
     .array(
       z.object({

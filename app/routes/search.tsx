@@ -1,5 +1,6 @@
 import { Link } from "react-router"
 import type { Route } from "./+types/search"
+import { fetcher } from "~/openlibrary/fetcher"
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url)
@@ -8,7 +9,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     return { results: [] }
   }
 
-  const response = await fetch(
+  const response = await fetcher(
     `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&fields=key,cover_i,title,subtitle,first_publish_year,cover_edition_key,author_name,isbn&limit=24`,
   )
 

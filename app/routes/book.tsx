@@ -4,28 +4,33 @@ import {
   EditionsSchema,
   AuthorSchema,
 } from "../openlibrary/schemas"
+import { fetcher } from "~/openlibrary/fetcher"
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const response = await fetch(
+  const response = await fetcher(
     `https://openlibrary.org/works/${params.key}.json`,
   )
 
   const work = WorkSchema.parse(await response.json())
 
-  const editionsResponse = await fetch(
+  const editionsResponse = await fetcher(
     `https://openlibrary.org/works/${params.key}/editions.json`,
   )
   const editions = EditionsSchema.parse(await editionsResponse.json())
   const authors = await Promise.all(
     work.authors.map(async (a: any) => {
-      const authorResponse = await fetch(
+      const authorResponse = await fetcher(
         `https://openlibrary.org${a.author.key}.json`,
       )
+      if (authorResponse.status !== 200) {
+        console.error(a.author.key, "not found")
+        return null
+      }
       return AuthorSchema.parse(await authorResponse.json())
     }),
   )
 
-  return { work, editions, authors }
+  return { work, editions, authors: authors.filter((a) => a !== null) }
 }
 
 export default function Book({ loaderData }: Route.ComponentProps) {
@@ -39,13 +44,15 @@ export default function Book({ loaderData }: Route.ComponentProps) {
             work.covers
               .slice()
               .reverse()
+              .slice(work.covers.length - 6, work.covers.length)
               .map((coverId, i, arr) => (
                 <img
+                  key={coverId}
                   className="rounded w-64 h-96 absolute transition-transform duration-300 group-hover:[transform:rotate(var(--rotate,0deg))] origin-bottom-right scale-[var(--scale,1)]"
                   style={
                     {
                       "--rotate": `${(arr.length - 1 - i) * 5 - 2}deg`,
-                      "--scale": `${(arr.length - 1 - i) * -0.05 + 1}`,
+                      "--scale": (arr.length - 1 - i) * -0.05 + 1,
                     } as React.CSSProperties
                   }
                   src={`https://covers.openlibrary.org/b/id/${coverId}-L.jpg`}
