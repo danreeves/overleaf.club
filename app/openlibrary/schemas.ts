@@ -34,8 +34,8 @@ export const WorkSchema = z.object({
       }
       return undefined
     }),
-  covers: z.array(z.number()),
-  subjects: z.array(z.string()),
+  covers: z.array(z.number()).optional(),
+  subjects: z.array(z.string()).optional(),
   latest_revision: z.number(),
   revision: z.number(),
   created: z.object({
