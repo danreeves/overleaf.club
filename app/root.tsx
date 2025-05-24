@@ -107,7 +107,9 @@ export default function App({ loaderData }: Route.ComponentProps) {
               </Link>
             </div>
           ) : (
-            <p>You are not logged in.</p>
+            <div className="flex items-center gap-2">
+              <Link to="/login">Log in</Link>
+            </div>
           )}
         </div>
       </header>
