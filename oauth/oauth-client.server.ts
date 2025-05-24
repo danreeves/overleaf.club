@@ -10,14 +10,23 @@ export async function getClient(
   env: Env,
   db: DrizzleD1Database,
 ): Promise<OAuthClient> {
+  const isLocal =
+    host.startsWith("http://localhost") ||
+    host.startsWith("http://127.0.0.1") ||
+    host.startsWith("http://[::1]")
+
   const client = new OAuthClient({
     handleResolver: "https://bsky.social", // backend instances should use a DNS based resolver
     responseMode: "query",
 
     clientMetadata: {
-      client_id: `${host}/client-metadata.json`,
+      client_id: isLocal
+        ? `http://localhost?scope=${encodeURI("atproto transition:generic")}&redirect_uri=${encodeURI("http://[::1]/oauth/callback")}`
+        : `${host}/client-metadata.json`,
       jwks_uri: `${host}/jwks.json`,
-      redirect_uris: [`${host}/oauth/callback`],
+      redirect_uris: isLocal
+        ? ["http://[::1]/oauth/callback"]
+        : [`${host}/oauth/callback`],
 
       token_endpoint_auth_signing_alg: "ES256",
       scope: "atproto transition:generic",
