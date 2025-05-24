@@ -1,9 +1,9 @@
 import "./patches"
+import type { OAuthClient } from "@atproto/oauth-client"
 import { createRequestHandler } from "react-router"
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1"
-import { getClient } from "oauth/oauth-client.server"
-import type { OAuthClient } from "@atproto/oauth-client"
-import { createSessionStorage } from "~/session.server"
+import { getClient } from "~/server/oauth-client.server"
+import { createSessionStorage } from "~/server/session.server"
 
 declare module "react-router" {
   export interface AppLoadContext {

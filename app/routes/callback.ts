@@ -1,5 +1,5 @@
 import { redirect } from "react-router"
-import type { Route } from "./+types/callback"
+import type { Route } from "./oauth/+types/callback"
 
 export async function loader({ context, request }: Route.LoaderArgs) {
   const params = new URLSearchParams(request.url.split("?")[1])

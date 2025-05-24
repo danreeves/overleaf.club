@@ -29,6 +29,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <>
           <p>Hello, {loaderData?.data.displayName}!</p>
           <img src={loaderData?.data.avatar} alt="Avatar" width={50} />
+          {/* <pre>{JSON.stringify(loaderData, null, 2)}</pre> */}
         </>
       ) : (
         <>

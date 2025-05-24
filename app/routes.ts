@@ -5,5 +5,8 @@ export default [
   route("login", "routes/login.tsx"),
   route("client-metadata.json", "routes/client-metadata.json.ts"),
   route("jwks.json", "routes/jwks.json.ts"),
-  route("oauth/callback", "routes/oauth/callback.ts"),
+  route("oauth/callback", "routes/callback.ts"),
+  route("search", "routes/search.tsx"),
+  route("book/:key", "routes/book.tsx"),
+  route(".well-known/appspecific/com.chrome.devtools.json", "routes/404.ts"),
 ] satisfies RouteConfig
