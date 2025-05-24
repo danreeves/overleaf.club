@@ -1,26 +1,43 @@
+import { Form, redirect } from "react-router"
 import type { Route } from "./+types/login"
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ]
-}
-
-export async function loader({ context }: Route.LoaderArgs) {
-  const url = await context.client.authorize("danreev.es", {
+export async function action({ context, request }: Route.ActionArgs) {
+  const formData = await request.formData()
+  const handle = formData.get("handle")
+  if (typeof handle !== "string" || !handle) {
+    return { error: "Handle is required" }
+  }
+  const url = await context.client.authorize(handle, {
     scope: "atproto transition:generic",
   })
 
-  return {
-    authorizeUrl: url.toString(),
-  }
+  return redirect(url.toString())
 }
 
-export default function Home({ loaderData }: Route.ComponentProps) {
+export default function Home({ actionData }: Route.ComponentProps) {
   return (
     <div>
-      <a href={loaderData.authorizeUrl}>Authorize URL</a>
+      <Form
+        method="post"
+        className="flex flex-col items-center justify-center min-h-screen"
+      >
+        <h1 className="text-4xl font-bold mb-4 font-serif text-leaf">Login</h1>
+        <input
+          type="text"
+          name="handle"
+          placeholder="Enter your handle"
+          className="border border-gray-300 p-2 mb-4"
+        />
+        <button
+          type="submit"
+          className="bg-leaf text-white p-2 rounded cursor-pointer"
+        >
+          Login
+        </button>
+        {actionData?.error && (
+          <p className="text-red-500 mt-2">{actionData.error}</p>
+        )}
+      </Form>
     </div>
   )
 }
