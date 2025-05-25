@@ -5,6 +5,20 @@ import type { DrizzleD1Database } from "drizzle-orm/d1"
 import { authSession, authState } from "database/schema"
 import { eq } from "drizzle-orm/sqlite-core/expressions"
 
+function cachedFetch(
+  url: string | URL | Request<unknown, CfProperties<unknown>>,
+  init?: RequestInit,
+): Promise<Response> {
+  // Cache all successful responses for 5 minutes, and do not cache 404 or 500+ responses.
+  return fetch(url, {
+    ...init,
+    cf: {
+      cacheTtlByStatus: { "200-299": 60 * 5, 404: 0, "500-599": 0 },
+      cacheEverything: true,
+    },
+  })
+}
+
 export async function getClient(
   host: string,
   env: Env,
@@ -16,6 +30,7 @@ export async function getClient(
     host.startsWith("http://[::1]")
 
   const client = new OAuthClient({
+    fetch: cachedFetch,
     handleResolver: "https://bsky.social", // backend instances should use a DNS based resolver
     responseMode: "query",
 
